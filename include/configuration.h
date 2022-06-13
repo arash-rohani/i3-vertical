@@ -312,7 +312,9 @@ struct Barconfig {
 
     /** Bar position (bottom by default). */
     enum { P_BOTTOM = 0,
-           P_TOP = 1 } position;
+           P_TOP = 1,
+           P_LEFT = 2,
+           P_RIGHT = 3 } position;
 
     /** Command that should be run to execute i3bar, give a full path if i3bar is not
      * in your $PATH.

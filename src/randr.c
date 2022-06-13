@@ -365,7 +365,9 @@ void output_init_con(Output *output) {
         return;
     }
 
-    DLOG("Changing layout, adding top/bottom dockarea\n");
+    DLOG("Changing layout, adding dockareas\n");
+
+    /* top dock container */
     Con *topdock = con_new(NULL, NULL);
     topdock->type = CT_DOCKAREA;
     topdock->layout = L_DOCKAREA;
@@ -385,8 +387,27 @@ void output_init_con(Output *output) {
     DLOG("attaching\n");
     con_attach(topdock, con, false);
 
-    /* content container */
+    /* left dock container */
+    Con *leftdock = con_new(NULL, NULL);
+    leftdock->type = CT_DOCKAREA;
+    leftdock->layout = L_DOCKAREA;
+    /* this container swallows dock clients */
+    match = scalloc(1, sizeof(Match));
+    match_init(match);
+    match->dock = M_DOCK_LEFT;
+    match->insert_where = M_BELOW;
+    TAILQ_INSERT_TAIL(&(leftdock->swallow_head), match, matches);
 
+    FREE(leftdock->name);
+    leftdock->name = sstrdup("leftdock");
+
+    sasprintf(&name, "[i3 con] left dockarea %s", con->name);
+    x_set_name(leftdock, name);
+    FREE(name);
+    DLOG("attaching\n");
+    con_attach(leftdock, con, false);
+
+    /* content container */
     DLOG("adding main content container\n");
     Con *content = con_new(NULL, NULL);
     content->type = CT_CON;
@@ -398,6 +419,26 @@ void output_init_con(Output *output) {
     x_set_name(content, name);
     FREE(name);
     con_attach(content, con, false);
+
+    /* right dock container */
+    Con *rightdock = con_new(NULL, NULL);
+    rightdock->type = CT_DOCKAREA;
+    rightdock->layout = L_DOCKAREA;
+    /* this container swallows dock clients */
+    match = scalloc(1, sizeof(Match));
+    match_init(match);
+    match->dock = M_DOCK_RIGHT;
+    match->insert_where = M_BELOW;
+    TAILQ_INSERT_TAIL(&(rightdock->swallow_head), match, matches);
+
+    FREE(rightdock->name);
+    rightdock->name = sstrdup("rightdock");
+
+    sasprintf(&name, "[i3 con] right dockarea %s", con->name);
+    x_set_name(rightdock, name);
+    FREE(name);
+    DLOG("attaching\n");
+    con_attach(rightdock, con, false);
 
     /* bottom dock container */
     Con *bottomdock = con_new(NULL, NULL);

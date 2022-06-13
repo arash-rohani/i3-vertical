@@ -254,22 +254,48 @@ void manage_window(xcb_window_t window, xcb_get_window_attributes_cookie_t cooki
         }
 
         /* find out the desired position of this dock window */
-        if (cwindow->reserved.top > 0 && cwindow->reserved.bottom == 0) {
+        if (cwindow->reserved.top > 0 && cwindow->reserved.bottom == 0 &&
+            cwindow->reserved.left == 0 && cwindow->reserved.right == 0) {
             DLOG("Top dock client\n");
             cwindow->dock = W_DOCK_TOP;
-        } else if (cwindow->reserved.top == 0 && cwindow->reserved.bottom > 0) {
+        } else if (cwindow->reserved.top == 0 && cwindow->reserved.bottom > 0 &&
+                   cwindow->reserved.left == 0 && cwindow->reserved.right == 0) {
             DLOG("Bottom dock client\n");
             cwindow->dock = W_DOCK_BOTTOM;
+        } else if (cwindow->reserved.top == 0 && cwindow->reserved.bottom == 0 &&
+                   cwindow->reserved.left > 0 && cwindow->reserved.right == 0) {
+            DLOG("Left dock client\n");
+            cwindow->dock = W_DOCK_LEFT;
+        } else if (cwindow->reserved.top == 0 && cwindow->reserved.bottom == 0 &&
+                   cwindow->reserved.left == 0 && cwindow->reserved.right > 0) {
+            DLOG("Right dock client\n");
+            cwindow->dock = W_DOCK_RIGHT;
         } else {
-            DLOG("Ignoring invalid reserved edges (_NET_WM_STRUT_PARTIAL), using position as fallback:\n");
-            if (geom->y < (int16_t)(search_at->rect.height / 2)) {
-                DLOG("geom->y = %d < rect.height / 2 = %d, it is a top dock client\n",
-                     geom->y, (search_at->rect.height / 2));
-                cwindow->dock = W_DOCK_TOP;
+            DLOG("Ignoring invalid reserved edges (_NET_WM_STRUT_PARTIAL), using size and position as fallback:\n");
+            if (geom->width > geom->height) {
+                DLOG("geom->width = %d > geom->height = %d, it a horizontal dock client\n",
+                     geom->width, geom->height);
+                if (geom->y < (int16_t)(search_at->rect.height / 2)) {
+                    DLOG("geom->y = %d < rect.height / 2 = %d, it is a top dock client\n",
+                         geom->y, (search_at->rect.height / 2));
+                    cwindow->dock = W_DOCK_TOP;
+                } else {
+                    DLOG("geom->y = %d >= rect.height / 2 = %d, it is a bottom dock client\n",
+                         geom->y, (search_at->rect.height / 2));
+                    cwindow->dock = W_DOCK_BOTTOM;
+                }
             } else {
-                DLOG("geom->y = %d >= rect.height / 2 = %d, it is a bottom dock client\n",
-                     geom->y, (search_at->rect.height / 2));
-                cwindow->dock = W_DOCK_BOTTOM;
+                DLOG("geom->width = %d <= geom->height = %d, it a vertical dock client\n",
+                     geom->width, geom->height);
+                if (geom->x < (int16_t)(search_at->rect.width / 2)) {
+                    DLOG("geom->x = %d < rect.width / 2 = %d, it is a left dock client\n",
+                         geom->x, (search_at->rect.width / 2));
+                    cwindow->dock = W_DOCK_LEFT;
+                } else {
+                    DLOG("geom->x = %d >= rect.width / 2 = %d, it is a right dock client\n",
+                         geom->x, (search_at->rect.width / 2));
+                    cwindow->dock = W_DOCK_RIGHT;
+                }
             }
         }
     }

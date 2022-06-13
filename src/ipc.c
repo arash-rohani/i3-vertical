@@ -791,6 +791,10 @@ static void dump_bar_config(yajl_gen gen, Barconfig *config) {
     ystr("position");
     if (config->position == P_BOTTOM)
         ystr("bottom");
+    else if (config->position == P_LEFT)
+        ystr("left");
+    else if (config->position == P_RIGHT)
+        ystr("right");
     else
         ystr("top");
 

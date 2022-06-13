@@ -441,7 +441,9 @@ struct Window {
     /** Whether the window says it is a dock window */
     enum { W_NODOCK = 0,
            W_DOCK_TOP = 1,
-           W_DOCK_BOTTOM = 2 } dock;
+           W_DOCK_BOTTOM = 2,
+           W_DOCK_LEFT = 3,
+           W_DOCK_RIGHT = 4 } dock;
 
     /** When this window was marked urgent. 0 means not urgent */
     struct timeval urgent;
@@ -520,7 +522,9 @@ struct Match {
         M_NODOCK = 0,
         M_DOCK_ANY = 1,
         M_DOCK_TOP = 2,
-        M_DOCK_BOTTOM = 3
+        M_DOCK_BOTTOM = 3,
+        M_DOCK_LEFT = 4,
+        M_DOCK_RIGHT = 5
     } dock;
     xcb_window_t id;
     enum { WM_ANY = 0,

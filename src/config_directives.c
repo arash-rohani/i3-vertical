@@ -647,7 +647,14 @@ CFGFUN(bar_bindsym, const char *button, const char *release, const char *command
 }
 
 CFGFUN(bar_position, const char *position) {
-    current_bar->position = (strcmp(position, "top") == 0 ? P_TOP : P_BOTTOM);
+    if (strcmp(position, "top") == 0)
+        current_bar->position = P_TOP;
+    else if (strcmp(position, "left") == 0)
+        current_bar->position = P_LEFT;
+    else if (strcmp(position, "right") == 0)
+        current_bar->position = P_RIGHT;
+    else
+        current_bar->position = P_BOTTOM;
 }
 
 CFGFUN(bar_i3bar_command, const char *i3bar_command) {
