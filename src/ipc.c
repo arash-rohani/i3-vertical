@@ -739,7 +739,7 @@ static void dump_bar_bindings(yajl_gen gen, Barconfig *config) {
 
 static char *canonicalize_output_name(char *name) {
     /* Do not canonicalize special output names. */
-    if (strcasecmp(name, "primary") == 0) {
+    if (strcasecmp(name, "primary") == 0 || strcasecmp(name, "nonprimary") == 0) {
         return name;
     }
     Output *output = get_output_by_name(name, false);
@@ -1682,7 +1682,7 @@ void ipc_send_barconfig_update_event(Barconfig *barconfig) {
 /*
  * For the binding events, we send the serialized binding struct.
  */
-void ipc_send_binding_event(const char *event_type, Binding *bind) {
+void ipc_send_binding_event(const char *event_type, Binding *bind, const char *modename) {
     DLOG("Issue IPC binding %s event (sym = %s, code = %d)\n", event_type, bind->symbol, bind->keycode);
 
     setlocale(LC_NUMERIC, "C");
@@ -1693,6 +1693,13 @@ void ipc_send_binding_event(const char *event_type, Binding *bind) {
 
     ystr("change");
     ystr(event_type);
+
+    ystr("mode");
+    if (modename == NULL) {
+        ystr("default");
+    } else {
+        ystr(modename);
+    }
 
     ystr("binding");
     dump_binding(gen, bind);
